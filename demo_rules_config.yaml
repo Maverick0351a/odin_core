@@ -1,0 +1,87 @@
+created_at: '2025-08-06T05:20:34.943715'
+description: ODIN Protocol Rule Engine Configuration
+rules:
+- action: approve
+  conditions:
+  - description: Near-perfect confidence
+    field: confidence
+    operator: '>='
+    value: 0.98
+  - description: Demo message
+    field: trace_id
+    operator: contains
+    value: demo
+  description: Auto-approve demo messages with very high confidence
+  enabled: true
+  metadata: {}
+  name: demo_high_priority_approval
+  priority: 1
+- action: escalate
+  conditions:
+  - description: Compliance topic detected
+    field: context.topic
+    operator: ==
+    value: compliance
+  description: Escalate messages flagged for compliance review
+  enabled: true
+  metadata: {}
+  name: compliance_escalation
+  priority: 5
+- action: approve
+  conditions:
+  - description: Confidence >= 90%
+    field: confidence
+    operator: '>='
+    value: 0.9
+  description: Approve messages with high confidence scores
+  enabled: true
+  metadata: {}
+  name: high_confidence_approval
+  priority: 10
+- action: reject
+  conditions:
+  - description: Confidence < 30%
+    field: confidence
+    operator: <
+    value: 0.3
+  description: Reject messages with very low confidence
+  enabled: true
+  metadata: {}
+  name: low_confidence_rejection
+  priority: 20
+- action: retry
+  conditions:
+  - description: 30% <= Confidence < 70%
+    field: confidence
+    operator: between
+    value:
+    - 0.3
+    - 0.7
+  description: Retry messages with medium confidence
+  enabled: true
+  metadata: {}
+  name: medium_confidence_retry
+  priority: 30
+- action: log_warning
+  conditions:
+  - description: Long demo message
+    field: message_length
+    operator: '>'
+    value: 1000
+  description: Monitor demo message length
+  enabled: true
+  metadata: {}
+  name: demo_content_length_check
+  priority: 40
+- action: log_warning
+  conditions:
+  - description: Message size > 10KB
+    field: message_size
+    operator: '>'
+    value: 10000
+  description: Log warning for large messages
+  enabled: true
+  metadata: {}
+  name: large_message_warning
+  priority: 50
+version: '1.0'

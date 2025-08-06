@@ -1,0 +1,223 @@
+version: "1.0"
+description: "ODIN Protocol Rule Engine Configuration"
+created_at: "2025-08-05T00:00:00"
+
+# Rule Engine Configuration for ODIN Protocol
+# This file demonstrates how decision rules can be externalized and configured
+
+rules:
+  # High Priority Rules (1-20)
+  - name: "critical_security_escalation"
+    description: "Immediately escalate any security-flagged content"
+    priority: 1
+    enabled: true
+    action: "escalate"
+    metadata:
+      category: "security"
+      severity: "critical"
+      audit_required: true
+    conditions:
+      - field: "security.threat_level"
+        operator: ">"
+        value: 0.8
+        description: "Security threat level above 80%"
+      - field: "security.flagged"
+        operator: "=="
+        value: true
+        description: "Content flagged by security scanner"
+
+  - name: "compliance_rejection"
+    description: "Reject messages that fail compliance checks"
+    priority: 5
+    enabled: true
+    action: "reject"
+    metadata:
+      category: "compliance"
+      requires_logging: true
+    conditions:
+      - field: "compliance.pii_detected"
+        operator: "=="
+        value: true
+        description: "Personal information detected"
+
+  - name: "high_confidence_approval"
+    description: "Auto-approve high-confidence messages"
+    priority: 10
+    enabled: true
+    action: "approve"
+    metadata:
+      category: "confidence"
+      auto_approve: true
+    conditions:
+      - field: "confidence"
+        operator: ">="
+        value: 0.95
+        description: "Confidence score 95% or higher"
+      - field: "source"
+        operator: "in"
+        value: ["trusted_api", "verified_user", "internal_system"]
+        description: "Message from trusted source"
+
+  # Medium Priority Rules (21-50)
+  - name: "semantic_drift_detection"
+    description: "Handle semantic drift in conversations"
+    priority: 25
+    enabled: true
+    action: "custom"
+    custom_handler: "semantic_drift_handler"
+    metadata:
+      category: "semantic_analysis"
+      requires_context: true
+    conditions:
+      - field: "semantic_drift"
+        operator: ">="
+        value: 0.5
+        description: "Semantic drift threshold exceeded"
+
+  - name: "retry_medium_confidence"
+    description: "Retry messages with medium confidence for improvement"
+    priority: 30
+    enabled: true
+    action: "retry"
+    metadata:
+      category: "confidence"
+      max_retries: 3
+    conditions:
+      - field: "confidence"
+        operator: "between"
+        value: [0.4, 0.8]
+        description: "Confidence between 40-80%"
+      - field: "retry_count"
+        operator: "<"
+        value: 3
+        description: "Haven't exceeded retry limit"
+
+  - name: "context_length_warning"
+    description: "Warn about excessively long context"
+    priority: 35
+    enabled: true
+    action: "log_warning"
+    metadata:
+      category: "performance"
+      monitoring: true
+    conditions:
+      - field: "context_length"
+        operator: ">"
+        value: 50000
+        description: "Context length exceeds 50k characters"
+
+  # Low Priority Rules (51-100)
+  - name: "user_preference_routing"
+    description: "Route based on user preferences"
+    priority: 60
+    enabled: true
+    action: "continue"
+    metadata:
+      category: "personalization"
+      routing_enabled: true
+    conditions:
+      - field: "user.preferences.model"
+        operator: "is_not_empty"
+        value: null
+        description: "User has model preferences set"
+
+  - name: "rate_limit_warning"
+    description: "Log warning when approaching rate limits"
+    priority: 70
+    enabled: true
+    action: "log_warning"
+    metadata:
+      category: "rate_limiting"
+      alert_threshold: 0.8
+    conditions:
+      - field: "rate_limit.usage_percentage"
+        operator: ">="
+        value: 0.8
+        description: "Rate limit usage above 80%"
+
+  - name: "low_confidence_rejection"
+    description: "Reject very low confidence messages"
+    priority: 80
+    enabled: true
+    action: "reject"
+    metadata:
+      category: "confidence"
+      feedback_collection: true
+    conditions:
+      - field: "confidence"
+        operator: "<"
+        value: 0.2
+        description: "Confidence below 20%"
+
+  # Monitoring and Analytics Rules
+  - name: "performance_monitoring"
+    description: "Monitor response times and log slow operations"
+    priority: 90
+    enabled: true
+    action: "log_warning"
+    metadata:
+      category: "performance"
+      metrics_collection: true
+    conditions:
+      - field: "response_time_ms"
+        operator: ">"
+        value: 5000
+        description: "Response time exceeds 5 seconds"
+
+  - name: "unusual_activity_detection"
+    description: "Detect unusual patterns in message flow"
+    priority: 95
+    enabled: true
+    action: "escalate"
+    metadata:
+      category: "anomaly_detection"
+      requires_investigation: true
+    conditions:
+      - field: "message_frequency"
+        operator: ">"
+        value: 100
+        description: "More than 100 messages per minute from single source"
+      - field: "pattern_anomaly_score"
+        operator: ">="
+        value: 0.7
+        description: "Anomaly detection score above 70%"
+
+# Global settings for the rule engine
+settings:
+  # Maximum number of rules to evaluate per request
+  max_rules_per_evaluation: 50
+  
+  # Enable detailed logging for rule execution
+  detailed_logging: true
+  
+  # Timeout for rule evaluation (milliseconds)
+  evaluation_timeout_ms: 1000
+  
+  # Enable performance metrics collection
+  collect_metrics: true
+  
+  # Default action when no rules match
+  default_action: "continue"
+  
+  # Enable rule validation on startup
+  validate_rules_on_startup: true
+
+# Custom handler configurations
+custom_handlers:
+  semantic_drift_handler:
+    enabled: true
+    thresholds:
+      high_drift: 0.8
+      medium_drift: 0.5
+    actions:
+      high_drift: "escalate"
+      medium_drift: "retry"
+      low_drift: "continue"
+  
+  compliance_check_handler:
+    enabled: true
+    strict_mode: true
+    violation_actions:
+      pii_detected: "reject"
+      inappropriate_content: "reject"
+      policy_violation: "escalate"

@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package odin;
+
+// ODIN Protocol Message Definition
+// Defines the structure for AI-to-AI communication logging
+
+message OdinMessage {
+  // Core identification fields
+  string trace_id = 1;           // Unique identifier for conversation trace
+  string session_id = 2;         // Session identifier for grouped interactions
+  string sender_id = 3;          // ID of the sending AI model
+  string receiver_id = 4;        // ID of the receiving AI model
+  string role = 5;               // Role: 'assistant', 'tool', 'user', 'mediator'
+  
+  // Message content
+  string raw_output = 6;         // Original unprocessed output
+  string healed_output = 7;      // Processed/corrected output
+  
+  // Metadata
+  int64 timestamp = 8;           // Unix timestamp in milliseconds
+  float semantic_drift_score = 9; // Measure of semantic deviation (0.0-1.0)
+  
+  // Healing process metadata
+  HealingMetadata healing_metadata = 10;
+  
+  // Conversation context
+  ConversationContext context = 11;
+  
+  // Performance metrics
+  PerformanceMetrics metrics = 12;
+  
+  // Additional metadata for rule processing and custom data
+  map<string, string> metadata = 13;
+}
+
+// Metadata about the healing/correction process
+message HealingMetadata {
+  string method = 1;             // Healing method used (e.g., 'auto_correct', 'semantic_repair')
+  float confidence = 2;          // Confidence in healing (0.0-1.0)
+  string source_document_id = 3; // Reference document used for healing
+  string notes = 4;              // Additional notes about the healing process
+  repeated string applied_rules = 5; // List of rules applied during healing
+  int32 iteration_count = 6;     // Number of healing iterations performed
+}
+
+// Context about the conversation state
+message ConversationContext {
+  string conversation_id = 1;    // Unique conversation identifier
+  int32 turn_number = 2;         // Turn number in the conversation
+  string conversation_type = 3;  // Type: 'dialogue', 'mediated', 'debate', etc.
+  string topic = 4;              // Main topic being discussed
+  repeated string key_themes = 5; // Key themes identified in conversation
+  string emotional_state = 6;    // Emotional state of the sender
+}
+
+// Performance and quality metrics
+message PerformanceMetrics {
+  int64 response_time_ms = 1;    // Response generation time in milliseconds
+  float coherence_score = 2;     // Message coherence score (0.0-1.0)
+  float relevance_score = 3;     // Topic relevance score (0.0-1.0)
+  int32 token_count = 4;         // Number of tokens in the message
+  float complexity_score = 5;    // Linguistic complexity score (0.0-1.0)
+  string model_version = 6;      // Version of the AI model used
+}
+
+// Batch message for efficient storage of multiple ODIN messages
+message OdinMessageBatch {
+  repeated OdinMessage messages = 1;
+  string batch_id = 2;
+  int64 batch_timestamp = 3;
+  string batch_metadata = 4;     // JSON metadata for the batch
+}
+
+// Reflection message for agent self-dialogue and mediator feedback
+message OdinReflection {
+  OdinMessage original = 1;          // Original message from agent
+  OdinMessage healed = 2;            // Modified/healed message (if applicable)
+  string mediator_id = 3;            // ID of the mediator AI that evaluated
+  string action_taken = 4;           // "pass", "modify", "reject"
+  string explanation = 5;            // Mediator's reasoning for the decision
+  float confidence_score = 6;        // Mediator's confidence in the decision (0.0-1.0)
+  int64 reflection_timestamp = 7;    // When the reflection was performed
+  int32 iteration_count = 8;         // Number of reflection iterations for this message
+  repeated string correction_tags = 9; // Tags describing what was corrected
+}
