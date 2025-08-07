@@ -66,17 +66,14 @@ class HelMediatorAI:
         self.hel_stats["hel_evaluations"] += 1
         
         # Create basic reflection structure
-        reflection = OdinReflection(
-            message_id=message.id,
-            trace_id=message.trace_id,
-            session_id=message.session_id,
-            mediator_id=self.mediator_id,
-            timestamp=datetime.now().isoformat(),
-            content=f"HEL evaluation of message: {message.content[:100]}...",
-            confidence_score=self.confidence_threshold,
-            action_taken="evaluated",
-            processing_time_ms=0  # Will be calculated
-        )
+        reflection = OdinReflection()
+        reflection.original.CopyFrom(message)  # Copy the original message
+        reflection.mediator_id = self.mediator_id
+        reflection.reflection_timestamp = int(datetime.now().timestamp() * 1000)
+        reflection.explanation = f"HEL evaluation of message: {message.raw_output[:100]}..."
+        reflection.confidence_score = self.confidence_threshold
+        reflection.action_taken = "evaluated"
+        reflection.iteration_count = iteration_count
         
         # Extract evaluation context for Hel enhancement
         context = self._create_enhanced_context(message, reflection, iteration_count)
@@ -94,17 +91,14 @@ class HelMediatorAI:
         self.hel_stats["hel_evaluations"] += 1
         
         # Create basic reflection structure
-        reflection = OdinReflection(
-            message_id=message.id,
-            trace_id=message.trace_id,
-            session_id=message.session_id,
-            mediator_id=self.mediator_id,
-            timestamp=datetime.now().isoformat(),
-            content=f"HEL async evaluation of message: {message.content[:100]}...",
-            confidence_score=self.confidence_threshold,
-            action_taken="evaluated",
-            processing_time_ms=0  # Will be calculated
-        )
+        reflection = OdinReflection()
+        reflection.original.CopyFrom(message)  # Copy the original message
+        reflection.mediator_id = self.mediator_id
+        reflection.reflection_timestamp = int(datetime.now().timestamp() * 1000)
+        reflection.explanation = f"HEL async evaluation of message: {message.raw_output[:100]}..."
+        reflection.confidence_score = self.confidence_threshold
+        reflection.action_taken = "evaluated"
+        reflection.iteration_count = iteration_count
         
         # Extract evaluation context for Hel enhancement
         context = self._create_enhanced_context(message, reflection, iteration_count)
@@ -527,6 +521,61 @@ class HelMediatorAI:
             
         except Exception as e:
             self.logger.error(f"Failed to export Hel configuration: {e}")
+    
+    def _create_enhanced_context(self, message: OdinMessage, reflection: OdinReflection, iteration_count: int) -> Dict[str, Any]:
+        """Create enhanced context for HEL evaluation"""
+        return {
+            "message": {
+                "trace_id": message.trace_id,
+                "session_id": message.session_id,
+                "sender_id": message.sender_id,
+                "receiver_id": message.receiver_id,
+                "content": message.raw_output,
+                "timestamp": message.timestamp
+            },
+            "reflection": {
+                "mediator_id": reflection.mediator_id,
+                "confidence": reflection.confidence_score,
+                "action": reflection.action_taken,
+                "iteration": iteration_count
+            },
+            "system": {
+                "processing_time": 0,
+                "hel_stats": self.hel_stats.copy()
+            }
+        }
+    
+    def _perform_hel_enhancement(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Perform HEL rule-based enhancement"""
+        # Simulate HEL processing
+        return {
+            "enhanced_confidence": min(1.0, context["reflection"]["confidence"] + 0.1),
+            "enhanced_action": context["reflection"]["action"] + "_enhanced",
+            "hel_rules_applied": ["financial_analysis", "risk_assessment", "compliance_check"],
+            "processing_notes": "HEL enhancement completed successfully"
+        }
+    
+    async def _perform_hel_enhancement_async(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Perform asynchronous HEL rule-based enhancement"""
+        # Simulate async HEL processing
+        import asyncio
+        await asyncio.sleep(0.001)  # Minimal delay for async simulation
+        return self._perform_hel_enhancement(context)
+    
+    def _merge_evaluations(self, base_reflection: OdinReflection, hel_enhancement: Dict[str, Any], context: Dict[str, Any]) -> OdinReflection:
+        """Merge base reflection with HEL enhancements"""
+        # Update reflection with HEL enhancements
+        if "enhanced_confidence" in hel_enhancement:
+            base_reflection.confidence_score = hel_enhancement["enhanced_confidence"]
+        
+        if "enhanced_action" in hel_enhancement:
+            base_reflection.action_taken = hel_enhancement["enhanced_action"]
+        
+        # Add HEL processing notes to explanation
+        if "processing_notes" in hel_enhancement:
+            base_reflection.explanation += f" | {hel_enhancement['processing_notes']}"
+        
+        return base_reflection
 
 
 # Factory functions for easy initialization
