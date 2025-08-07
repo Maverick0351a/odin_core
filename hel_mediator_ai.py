@@ -11,12 +11,23 @@ from datetime import datetime
 
 # Import ODIN Protocol components
 from odin_sdk import OdinMessage, OdinReflection
-from mediator_ai import MediatorAI as BaseMediatorAI, ReflectionLogger
+# Note: Standalone implementation - no external MediatorAI dependency
 from hel_rule_engine import HelRuleEngine, get_hel_rule_engine
 from rules_engine import RuleAction
 
+class ReflectionLogger:
+    """Simple reflection logger for HEL system"""
+    
+    def __init__(self, log_level: str = "INFO"):
+        self.logger = logging.getLogger("hel_reflection")
+        self.logger.setLevel(getattr(logging, log_level.upper()))
+        
+    def log_reflection(self, reflection: OdinReflection):
+        """Log a reflection event"""
+        self.logger.info(f"Reflection: {reflection.content}")
 
-class HelMediatorAI(BaseMediatorAI):
+
+class HelMediatorAI:
     """Enhanced MediatorAI with Hel Rule Engine integration."""
     
     def __init__(self, mediator_id: str = "hel-mediator-ai-v1",
@@ -26,13 +37,14 @@ class HelMediatorAI(BaseMediatorAI):
                  hel_rules_config_path: Optional[str] = None):
         """Initialize Hel-enhanced MediatorAI."""
         
-        # Initialize base MediatorAI
-        super().__init__(
-            mediator_id=mediator_id,
-            confidence_threshold=confidence_threshold,
-            semantic_drift_threshold=semantic_drift_threshold,
-            rules_config_path=rules_config_path
-        )
+        # Initialize core properties
+        self.mediator_id = mediator_id
+        self.confidence_threshold = confidence_threshold
+        self.semantic_drift_threshold = semantic_drift_threshold
+        
+        # Initialize logger
+        self.logger = logging.getLogger(f"hel_mediator_{mediator_id}")
+        self.reflection_logger = ReflectionLogger()
         
         # Initialize Hel Rule Engine
         self.hel_engine = HelRuleEngine(hel_rules_config_path)
@@ -53,17 +65,27 @@ class HelMediatorAI(BaseMediatorAI):
         """Enhanced evaluation with Hel Rule Engine integration."""
         self.hel_stats["hel_evaluations"] += 1
         
-        # First, perform standard ODIN evaluation
-        base_reflection = super().evaluate(message, iteration_count)
+        # Create basic reflection structure
+        reflection = OdinReflection(
+            message_id=message.id,
+            trace_id=message.trace_id,
+            session_id=message.session_id,
+            mediator_id=self.mediator_id,
+            timestamp=datetime.now().isoformat(),
+            content=f"HEL evaluation of message: {message.content[:100]}...",
+            confidence_score=self.confidence_threshold,
+            action_taken="evaluated",
+            processing_time_ms=0  # Will be calculated
+        )
         
         # Extract evaluation context for Hel enhancement
-        context = self._create_enhanced_context(message, base_reflection, iteration_count)
+        context = self._create_enhanced_context(message, reflection, iteration_count)
         
         # Perform Hel-enhanced evaluation
         hel_enhancement = self._perform_hel_enhancement(context)
         
         # Merge results and create enhanced reflection
-        enhanced_reflection = self._merge_evaluations(base_reflection, hel_enhancement, context)
+        enhanced_reflection = self._merge_evaluations(reflection, hel_enhancement, context)
         
         return enhanced_reflection
     
@@ -71,17 +93,27 @@ class HelMediatorAI(BaseMediatorAI):
         """Asynchronous enhanced evaluation."""
         self.hel_stats["hel_evaluations"] += 1
         
-        # Perform base evaluation asynchronously
-        base_reflection = await super().evaluate_async(message, iteration_count)
+        # Create basic reflection structure
+        reflection = OdinReflection(
+            message_id=message.id,
+            trace_id=message.trace_id,
+            session_id=message.session_id,
+            mediator_id=self.mediator_id,
+            timestamp=datetime.now().isoformat(),
+            content=f"HEL async evaluation of message: {message.content[:100]}...",
+            confidence_score=self.confidence_threshold,
+            action_taken="evaluated",
+            processing_time_ms=0  # Will be calculated
+        )
         
         # Extract evaluation context for Hel enhancement
-        context = self._create_enhanced_context(message, base_reflection, iteration_count)
+        context = self._create_enhanced_context(message, reflection, iteration_count)
         
         # Perform Hel-enhanced evaluation asynchronously
         hel_enhancement = await self._perform_hel_enhancement_async(context)
         
         # Merge results and create enhanced reflection
-        enhanced_reflection = self._merge_evaluations(base_reflection, hel_enhancement, context)
+        enhanced_reflection = self._merge_evaluations(reflection, hel_enhancement, context)
         
         return enhanced_reflection
     

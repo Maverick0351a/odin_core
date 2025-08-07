@@ -1,6 +1,7 @@
 """
-ODIN Protocol - Brazil Market Implementation
-Portuguese-optimized AI coordination for Latin America's largest tech market
+ODIN Protocol - Brazil Market Expansion
+US-based AI coordination protocol expanding to Brazil for client acquisition
+Developed by Travis Johnson - Johnson Technologies (USA)
 """
 
 from odin_sdk import OdinClient
@@ -153,20 +154,22 @@ BRASIL_CONFIG = {
         'ciclo_faturamento': ['mensal', 'trimestral', 'anual'],
         'desconto_startup': 60,  # 60% desconto para startups registradas
         'programa_universidade_global': {
-            'desconto': 100,  # GRATUITO para universidades mundiais
+            'desconto': 100,  # FREE for global universities (US program expansion)
             'requisitos': [
-                'opt_in_dados_pesquisa',
-                'citacao_obrigatoria_travis_johnson',
-                'publicacao_resultados_academicos',
-                'compartilhamento_casos_uso_anonimos'
+                'opt_in_research_data_sharing',
+                'mandatory_citation_travis_johnson_usa',
+                'academic_publication_results',
+                'anonymous_use_case_sharing'
             ],
-            'citacao_formato': 'Johnson, T.J. (2025). ODIN Protocol: Heuristic-Empowered Logic System for AI-to-AI Communication. DOI: 10.1000/odin-protocol',
+            'citacao_formato': 'Johnson, T.J. (2025). ODIN Protocol: Heuristic-Empowered Logic System for AI-to-AI Communication. Johnson Technologies, USA. DOI: 10.1000/odin-protocol',
             'dados_compartilhados': [
-                'metricas_performance_anonimas',
-                'padroes_uso_agregados',
-                'casos_sucesso_anonimizados',
-                'benchmarks_comparativos'
-            ]
+                'anonymous_performance_metrics',
+                'aggregated_usage_patterns', 
+                'anonymized_success_cases',
+                'comparative_benchmarks'
+            ],
+            'headquarters': 'Johnson Technologies - USA',
+            'international_expansion': 'Brazil market penetration for US company'
         }
     }
 }
