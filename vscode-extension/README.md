@@ -1,5 +1,7 @@
 # 🧠 ODIN Protocol HEL Rule System - VS Code Extension
 
+![ODIN Protocol Logo](../logo.png)
+
 **100% Functional AI-to-AI Communication Infrastructure - Production Ready with 57K+ msgs/sec throughput, Enterprise Billing, and Global Market Support!**
 
 [![Version](https://img.shields.io/badge/version-1.2.0-blue)](https://marketplace.visualstudio.com/items?itemName=travisjohnson.odin-protocol-hel)

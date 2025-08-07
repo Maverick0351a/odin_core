@@ -1,5 +1,7 @@
 # ODIN Protocol - AI-to-AI Communication Infrastructure
 
+![ODIN Protocol Logo](logo.png)
+
 [![PyPI version](https://badge.fury.io/py/odin-protocol.svg)](https://pypi.org/project/odin-protocol/)
 [![VS Code Extension](https://img.shields.io/vscode-marketplace/v/travisjohnson.odin-protocol-hel)](https://marketplace.visualstudio.com/items?itemName=travisjohnson.odin-protocol-hel)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
